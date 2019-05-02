@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-sm-12">
+                <h2 class="text-center">Chat Application
+                <div id="status"></div>
+                <div class="chat">
+                    </h2>
+                    <div class="form-group nameDiv">
+                      <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                    </div>
+                    <input type="hidden" name="_id" id="object_id">
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-2 userNameDiv">
+                          <h5 id="userNameText">Ashok</h5>
+                        </div>
+                        <div class="col-md-8 msgDiv">
+                          <input type="text" name="msg" id="msg" class="form-control" placeholder="Msg">
+                        </div>
+                        <div class="col-md-1">
+                            <button id="submit" class="btn btn-success" type="button">Submit</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat_type_msg"></div>
+        <div class="chat_desk"></div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.dev.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script>
+        $('.userNameDiv,.msgDiv').hide();
+        (function(){
+            var socket = io.connect('http://localhost:5000');
+            if(socket !== undefined){
+                console.log('Socket Connected');
+                socket.on('output', (data) => {
+                    console.log(data);
+                }) 
+
+                var chatDesk = $('.chat_desk').val();
+
+                $('#submit').on('click',function(){
+                  var username = $('#name').val();
+                  var msg = $('#msg').val();                     
+                  socket.emit('changeUserName',{ username: username});
+                  if(msg != ""){
+                    socket.emit('newMessage',{ username: username, message: msg });
+                  }
+                })
+
+                socket.on('changeUserName',(data)=>{
+                  
+                  data = data.data;
+                  if(!data._id){
+                    alert('Something went wrong!')
+                    return false;
+                  }
+                  console.log('add')
+                  $('.nameDiv').hide();
+                  $('.userNameDiv,.msgDiv').show();
+                  $('#object_id').val(data._id);
+                  $('#userNameText').text(data.username);
+
+                })
+
+                socket.on('newMessage',(data)=>{
+                  $('.chat_desk').append(`<p class="message">${data.username}: ${data.message}</p>`);
+                })
+
+                $('#msg').on('keypress',()=>{
+                  socket.emit('typing');
+                })
+                
+                socket.on('typing', (data) => {
+                  $('.chat_type_msg').append(`<p class="typingChat">${data.message}`);
+                })
+            }
+        })();
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-sm-12">
+                <h2 class="text-center">Chat Application
+                <div id="status"></div>
+                <div class="chat">
+                    <button id="clear" style="float:right; margin:10px;" class="btn btn-danger">x</button> </h2>
+                    <div class="form-group">
+                      <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                    </div>
+
+                    <div class="card">
+                        <div id="messages" class="card-block">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="msg" id="msg" class="form-control" placeholder="Msg">
+                    </div>
+                    <button id="submit" class="btn btn-success">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.dev.js"></script>
+
+    <script>
+        (function(){
+            var element = function(id){
+                return document.getElementById(id);
+            }
+
+            var status = element('status');
+            var messages = element('messages');
+            var name = element('name');
+            var msg = element('msg');
+            var clear = element('clear');
+
+
+            var statusDefault = status.textContent;
+
+            var setStatus = function(s){
+                status.textContent = s;
+                if(s !== statusDefault){
+                    var delay = setTimeout(() => {
+                        setStatus(statusDefault);
+                    },4000);
+                }
+            }
+
+            var socket = io.connect('http://localhost:5000');
+            if(socket !== undefined){
+                console.log('Socket Connected');
+                socket.on('output', (data) => {
+                    console.log(data);
+                }) 
+            }
+        })();
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
